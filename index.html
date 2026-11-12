@@ -28,7 +28,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 
 .overlay{position:absolute;inset:0;display:grid;place-items:center;padding:10px;overflow:auto;background:rgba(20,30,90,.6)}
 .overlay[hidden]{display:none}
-.cartao{width:min(640px,100%);background:var(--marinho);border:4px solid #fff;box-shadow:0 0 0 4px #000,6px 6px 0 4px rgba(0,0,0,.5);padding:clamp(12px,2vw,20px);text-align:center}
+.cartao{width:min(660px,100%);background:var(--marinho);border:4px solid #fff;box-shadow:0 0 0 4px #000,6px 6px 0 4px rgba(0,0,0,.5);padding:clamp(12px,2vw,20px);text-align:center}
 .titulo{font-size:clamp(18px,3.6vw,34px);line-height:1.25;color:var(--amarelo);text-shadow:4px 4px 0 var(--vermelho)}
 .cartao p{margin-top:10px}
 .legenda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;font-size:9px;line-height:1.5}
@@ -89,7 +89,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
       <div class="overlay" id="tela-inicio">
         <div class="cartao">
           <h1 class="titulo">SUPER ROBÔ</h1>
-          <p>Complete as 3 missões e chegue às bandeiras!</p>
+          <p>Complete as 5 missões e chegue às bandeiras!</p>
           <div class="legenda" id="legenda"></div>
           <input id="nome" maxlength="12" autocomplete="off" placeholder="SEU NOME" aria-label="Seu nome">
           <button class="botao grande" id="b-jogar" type="button">COMEÇAR</button>
@@ -140,21 +140,22 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
   const TEMPO = 200;                      // segundos para cada missão
   const VIDAS = 3;
   const GRAV = .6, PULO = -13.2, VMAX = 4.6;
-  const CHAVE = 'superrobo.ranking.v2';   // nome do ranking salvo no navegador
-  const NIVEIS = [[0,'Robô novato'],[400,'Robô explorador'],[1000,'Super robô'],[2000,'Lenda dos circuitos']];
-  const ESTRELAS = [[2000,3],[900,2],[0,1]];
+  const CHAVE = 'superrobo.ranking.v3';   // nome do ranking salvo no navegador
+  const NIVEIS = [[0,'Robô novato'],[600,'Robô explorador'],[1800,'Super robô'],[3500,'Lenda dos circuitos']];
+  const ESTRELAS = [[3500,3],[1500,2],[0,1]];
 
   /* ---------- Missões ----------
-     chao: trechos de chão [início, fim]    canos: [coluna, altura]
-     blocos: [linha, coluna, texto] com 2 tijolo, 3 bloco ?, 8 bloco ? com bateria, 6 pedra, . vazio
-     escada: [coluna, degraus]              bugs/virus: colunas dos inimigos */
+     chao: trechos de chão [início, fim]    canos: [coluna, altura]    teto: trechos com teto
+     blocos: [linha, coluna, texto] com 2 tijolo, 3 bloco ?, 8 bloco ? com bateria, 6 pedra, c canhão, . vazio
+     escada: [coluna, degraus]              bugs / virus / cascos: colunas dos inimigos
+     plantas: colunas (esquerda) dos canos que têm planta */
   const FASES = [
     { nome: 'O CAMPO DIGITAL', tema: 0, cols: 140, pole: 131, check: 76,
       chao: [[0,22],[25,45],[48,70],[74,100],[104,139]],
       canos: [[30,2],[38,3],[56,2],[80,3],[90,2]],
       blocos: [[5,10,'8'],[5,14,'23232'],[2,16,'3'],[5,50,'2323'],[5,60,'232'],[4,84,'232'],[5,106,'23282'],[2,108,'3']],
       escada: [118,4],
-      bugs: [16,20,33,41,50,58,66,78,84,94,98,108,112,115], virus: [],
+      bugs: [16,20,33,41,50,58,66,78,84,94,98,108,112,115], virus: [], cascos: [44,64,96,110],
       estrelas: [[27,7],[28,7],[29,7],[30,4],[31,4],[38,3],[39,3],[14,4],[15,4],[17,4],[18,4],[51,4],[52,4],[60,4],[61,4],[62,4],[56,5],[57,5],[80,3],[81,3],[84,3],[85,3],[86,3],[90,5],[91,5],[106,4],[107,4],[109,4],[110,4],[124,2],[125,2],[126,2]] },
     { nome: 'A CAVERNA DOS CIRCUITOS', tema: 1, cols: 130, pole: 124, check: 66,
       chao: [[0,18],[22,36],[40,60],[64,84],[89,129]],
@@ -163,21 +164,44 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
       blocos: [[5,44,'2823'],[4,72,'23282'],[5,98,'232'],[6,38,'6'],[6,86,'66']],
       escada: [110,5],
       bugs: [14,24,31,43,52,57,67,76,81,92,100,118], virus: [34,50,74,107],
+      cascos: [30,62,100,120], plantas: [46,95],
       estrelas: [[28,6],[29,6],[30,6],[44,4],[46,4],[47,4],[52,4],[53,4],[56,5],[57,5],[72,3],[73,3],[74,3],[98,4],[99,4],[100,4],[95,2],[96,2],[104,5],[105,5]] },
     { nome: 'A TORRE DA IA', tema: 2, cols: 150, pole: 142, check: 80,
       chao: [[0,20],[24,42],[46,64],[68,86],[91,112],[116,149]],
       canos: [[28,2],[34,3],[52,2],[58,3],[74,2],[98,3],[104,2],[108,3]],
-      blocos: [[5,16,'2382'],[4,36,'23232'],[5,54,'2323'],[3,60,'3'],[5,78,'23282'],[4,94,'2323'],[5,120,'232'],[4,126,'2828'],[6,22,'6'],[6,44,'6'],[6,66,'6'],[6,88,'66']],
+      blocos: [[5,16,'2382'],[4,36,'23232'],[5,54,'2323'],[3,60,'3'],[5,78,'23282'],[4,94,'2323'],[5,120,'232'],[4,126,'2828'],[6,22,'6'],[6,44,'6'],[6,66,'6'],[6,88,'66'],[7,101,'c'],[6,125,'c'],[7,125,'6']],
       escada: [132,5],
       bugs: [8,15,26,31,38,48,55,62,70,77,84,94,101,111,119,124], virus: [18,40,50,64,72,82,92,103,121,128,139],
-      estrelas: [[16,4],[17,4],[19,4],[36,3],[37,3],[38,3],[39,3],[40,3],[54,4],[55,4],[56,4],[60,2],[78,4],[79,4],[80,4],[82,4],[94,3],[95,3],[96,3],[120,4],[121,4],[122,4],[126,3],[127,3],[128,3],[129,3]] }
+      cascos: [12,29,45,57,72,97,118,124], plantas: [34,58,98],
+      estrelas: [[16,4],[17,4],[19,4],[36,3],[37,3],[38,3],[39,3],[40,3],[54,4],[55,4],[56,4],[60,2],[78,4],[79,4],[80,4],[82,4],[94,3],[95,3],[96,3],[120,4],[121,4],[122,4],[126,3],[127,3],[128,3],[129,3]] },
+    { nome: 'A FÁBRICA DE ROBÔS', tema: 3, cols: 150, pole: 142, check: 80,
+      chao: [[0,20],[23,44],[48,66],[70,88],[92,112],[117,149]],
+      canos: [[28,2],[36,3],[54,2],[76,3],[98,2],[104,3]],
+      blocos: [[5,12,'2382'],[4,30,'23232'],[5,50,'2323'],[5,72,'2823'],[4,94,'2323'],[6,46,'6'],[6,68,'6'],[6,90,'6'],[6,114,'66'],
+               [7,40,'c'],[6,60,'c'],[7,60,'6'],[5,84,'c'],[6,84,'6'],[7,84,'6'],[6,108,'c'],[7,108,'6'],[7,122,'c']],
+      escada: [133,5],
+      bugs: [8,16,25,33,42,50,58,63,72,79,87,94,101,111,119,127],
+      cascos: [19,34,52,74,96,118,128], plantas: [36,54,98],
+      virus: [30,62,106,112],
+      estrelas: [[12,4],[13,4],[15,4],[30,3],[31,3],[32,3],[33,3],[34,3],[72,4],[73,4],[74,4],[75,4],[94,3],[95,3],[96,3],[97,3],[84,3],[60,4],[108,4]] },
+    { nome: 'O CASTELO DO BUG REI', tema: 4, cols: 160, pole: 152, check: 84,
+      chao: [[0,16],[19,38],[42,60],[64,80],[84,104],[108,126],[130,159]],
+      teto: [[0,104]],
+      canos: [[26,2],[48,3],[90,2],[96,3]],
+      blocos: [[5,8,'2382'],[4,44,'2328'],[4,110,'2828'],[6,18,'6'],[6,40,'6'],[6,62,'6'],[6,82,'6'],[6,106,'6'],[6,128,'6'],
+               [7,22,'c'],[6,34,'c'],[7,34,'6'],[7,56,'c'],[6,70,'c'],[7,70,'6'],[5,88,'c'],[6,88,'6'],[7,88,'6'],[7,100,'c'],[6,112,'c'],[7,112,'6'],[7,120,'c'],[6,136,'c'],[7,136,'6'],[7,145,'c']],
+      escada: [146,5],
+      bugs: [6,13,24,30,45,52,58,66,75,78,92,102,115,124,140,148],
+      cascos: [10,28,36,47,68,86,94,118,132,142], plantas: [26,48,96],
+      virus: [20,32,54,72,98,114,122,138],
+      estrelas: [[8,4],[9,4],[11,4],[44,2],[45,2],[46,2],[47,2],[110,2],[111,2],[112,2],[113,2],[88,3]] }
   ];
 
   const $ = s => document.querySelector(s);
   const cv = $('#jogo'), cx = cv.getContext('2d');
   cx.imageSmoothingEnabled = false;
 
-  /* ---------- Sprites em pixel art ---------- */
+  /* ---------- Sprites em pixel art (todos desenhados do zero) ---------- */
   const PAL = { k:'#1a1c4d', b:'#4fb8ff', l:'#c4ecff', w:'#ffffff', y:'#ffd23f', r:'#ff4d6d', g:'#46d17a' };
   const PALG = { ...PAL, b:'#ff9a3d', l:'#fff0a0', y:'#ff4d6d' };   // cores do Super Robô
   function spr(rows, pal = PAL) {
@@ -200,13 +224,40 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
   const CORA = spr(['.rr.rr.','rrrrrrr','rrrrrrr','.rrrrr.','..rrr..','...r...']);
   const BAT = spr(['..kkkk..','..kyyk..','.kkkkkk.','.kggggk.','.kgyggk.','.kggyyk.','.kgyggk.','.kggggk.','.kkkkkk.']);
 
-  /* ---------- Peças do cenário (uma coleção de cores por missão) ---------- */
   const mk = fn => { const c = document.createElement('canvas'); c.width = c.height = T; fn(c.getContext('2d')); return c; };
+  const mk2 = (w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d')); return c; };
   const R = (g, c, x, y, w, h) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+
+  /* Caracol-robô: anda, vira casco quando pisado e pode ser chutado (olha para a esquerda) */
+  const CASCO = mk2(12, 10, g => {
+    R(g,'#1a1c4d',0,6,12,4); R(g,'#ffd6a8',1,7,10,2);
+    R(g,'#1a1c4d',1,3,2,4); R(g,'#ffd6a8',1,4,1,3);
+    R(g,'#1a1c4d',0,1,4,3); R(g,'#ffd6a8',1,2,2,1); R(g,'#fff',1,2,1,1);
+    R(g,'#1a1c4d',4,0,8,8); R(g,'#b57aff',5,1,6,6); R(g,'#7a45d6',6,2,4,4); R(g,'#b57aff',7,3,2,2);
+  });
+  const CASCOP = mk2(12, 8, g => {
+    R(g,'#1a1c4d',1,0,10,8); R(g,'#b57aff',2,1,8,6); R(g,'#7a45d6',3,2,6,4); R(g,'#b57aff',5,3,2,2);
+  });
+  /* Bala de canhão: bola de ferro com chama (voa para a direita; é espelhada quando vai para a esquerda) */
+  const BALA = mk2(12, 10, g => {
+    R(g,'#ff9a3d',0,3,4,4); R(g,'#ffd23f',1,4,3,2);
+    R(g,'#1a1c4d',3,1,8,8); R(g,'#3b3f5c',4,2,6,6); R(g,'#8e93b8',5,3,2,2);
+  });
+  /* Flor-chip: planta de circuito que sai dos canos */
+  const FLOR = mk2(12, 14, g => {
+    R(g,'#1a1c4d',3,0,6,8); R(g,'#1a1c4d',1,2,10,4);
+    R(g,'#4fe0ff',4,1,4,6); R(g,'#4fe0ff',2,3,8,2); R(g,'#ffd23f',5,3,2,2);
+    R(g,'#1a1c4d',4,8,4,6); R(g,'#46d17a',5,8,2,6);
+    R(g,'#46d17a',1,10,4,2); R(g,'#46d17a',7,11,4,2);
+  });
+
+  /* ---------- Peças do cenário (uma coleção de cores por missão) ---------- */
   const TEMAS = [
     { gb:'#b8692f', gt:'#4ec36a', gd:'#2f9a4c', gm:'#9a5424', br:'#e0603a', bm:'#7a2e16', pc:'#2fbf5b', ph:'#57e083', pd:'#1d7d3a' },
     { gb:'#4b4f78', gt:'#8a90ad', gd:'#6a6f94', gm:'#3a3d5c', br:'#6b5bd6', bm:'#2e2766', pc:'#d7468a', ph:'#ff7fb8', pd:'#8e2358' },
-    { gb:'#243049', gt:'#3be7c4', gd:'#1fb59a', gm:'#1b2438', br:'#2f7bd6', bm:'#122a52', pc:'#e0a52a', ph:'#ffd66e', pd:'#8c6212' }
+    { gb:'#243049', gt:'#3be7c4', gd:'#1fb59a', gm:'#1b2438', br:'#2f7bd6', bm:'#122a52', pc:'#e0a52a', ph:'#ffd66e', pd:'#8c6212' },
+    { gb:'#5b6272', gt:'#ffb347', gd:'#d98a1c', gm:'#454b5a', br:'#8a93a8', bm:'#3a4050', pc:'#4fb8ff', ph:'#a6dcff', pd:'#1e6aa8' },
+    { gb:'#4a2a3a', gt:'#7a4a5a', gd:'#5c3445', gm:'#2f1824', br:'#8b3a4a', bm:'#3a1420', pc:'#8a8f9c', ph:'#c3c8d6', pd:'#555a68' }
   ];
   function tileset(q) {
     const t = {};
@@ -219,19 +270,23 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     t[6] = mk(g => { R(g,'#5b6478',0,0,T,T); R(g,'#aab3c8',3,3,T-6,T-6); R(g,'#8892a8',3,T-9,T-6,6); });
     t[7] = mk(g => { R(g,q.pc,0,0,T,T); R(g,q.ph,6,0,8,T); R(g,q.pd,T-8,0,8,T); R(g,q.pd,0,0,T,14); R(g,q.pc,2,2,T-4,10); R(g,q.ph,6,2,8,10); });
     t[9] = mk(g => { R(g,q.gb,0,0,T,T); R(g,q.gm,6,10,10,6); R(g,q.gm,24,24,10,6); });
+    t[10] = mk(g => {                                   // canhão
+      R(g,'#2a2d40',0,0,T,T); R(g,'#4a4f66',3,3,T-6,T-6); R(g,'#2a2d40',9,9,22,22); R(g,'#0d0f20',12,12,16,16);
+      [[5,5],[T-9,5],[5,T-9],[T-9,T-9]].forEach(([x, y]) => R(g,'#6b7090',x,y,4,4));
+    });
     return t;
   }
   const TS = TEMAS.map(tileset);
 
   /* Ícones da tela inicial */
-  [[ESTR,'Estrela: +10'],[BUG,'Pule em cima do bug!'],[VIRUS,'Vírus: não pise, desvie!'],[BAT,'Bateria: vire SUPER!']].forEach(([s, t]) => {
+  [[ESTR,'Estrela: +10'],[BUG,'Pule em cima do bug!'],[VIRUS,'Vírus: só dá para desviar!'],[BAT,'Bateria: vire SUPER!']].forEach(([s, t]) => {
     const d = document.createElement('div'), im = document.createElement('img');
     im.src = s.toDataURL(); im.alt = ''; d.append(im, document.createTextNode(t)); $('#legenda').appendChild(d);
   });
 
   /* ---------- Estado ---------- */
   let COLS = 140, POLEX = 0, CHECKX = 0, tema = 0;
-  let map = [], ini = [], estr = [], itens = [], bumps = {}, pops = [], ps = [];
+  let map = [], ini = [], estr = [], itens = [], plantas = [], canhoes = [], balas = [], bumps = {}, pops = [], ps = [];
   let modo = 'espera';   // espera (demonstração) | intro | jogo | fim
   let fase = 0, demoFase = 0, introT = 0, transf = 0;
   let pontos = 0, vidas = VIDAS, coletadas = 0, pisados = 0, bonusTotal = 0, inv = 0, t0 = 0, restante = TEMPO;
@@ -254,11 +309,23 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     F.chao.forEach(([a, b]) => { for (let c = a; c <= b; c++) { map[8][c] = 1; map[9][c] = 1; } });
     (F.teto || []).forEach(([a, b]) => { for (let c = a; c <= b; c++) { map[0][c] = 9; map[1][c] = 9; } });
     F.canos.forEach(([c, h]) => { for (let r = 8 - h; r < 8; r++) { map[r][c] = 5; map[r][c + 1] = 5; } });
-    F.blocos.forEach(([r, c, s]) => [...s].forEach((ch, i) => { if (ch !== '.') map[r][c + i] = +ch; }));
+    F.blocos.forEach(([r, c, s]) => [...s].forEach((ch, i) => { if (ch !== '.') map[r][c + i] = ch === 'c' ? 10 : +ch; }));
     const [ec, eh] = F.escada;
     for (let i = 0; i < eh; i++) for (let j = 0; j <= i; j++) map[7 - j][ec + i] = 6;
-    const inimigo = (c, tipo) => { const v = tipo === 'virus', h = v ? 32 : 26; return { x: c * T, y: 8 * T - h, w: 32, h, vx: v ? -.7 : -1, vy: 0, morto: 0, tipo }; };
-    ini = [...F.bugs.map(c => inimigo(c, 'bug')), ...F.virus.map(c => inimigo(c, 'virus'))];
+
+    const inimigo = (c, tipo) => {
+      if (map[8][c] !== 1 || map[7][c] || map[6][c]) return null;          // só nasce em chão livre
+      const h = tipo === 'virus' ? 32 : tipo === 'casco' ? 30 : 26;
+      return { x: c * T, y: 8 * T - h, w: 32, h, vx: tipo === 'virus' ? -.7 : tipo === 'casco' ? -.8 : -1, vy: 0, morto: 0, tipo, estado: 0, chute: 0 };
+    };
+    ini = [['bug', F.bugs], ['virus', F.virus], ['casco', F.cascos || []]].flatMap(([t, l]) => l.map(c => inimigo(c, t))).filter(Boolean);
+    plantas = (F.plantas || []).map(c => {
+      const q = F.canos.find(z => z[0] === c);
+      return q && { x: c * T + 26, topo: (8 - q[1]) * T, t: Math.floor(Math.random() * 270), alt: 0 };
+    }).filter(Boolean);
+    canhoes = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (map[r][c] === 10) canhoes.push({ x: c * T, y: r * T, t: 60 + Math.floor(Math.random() * 100) });
+
     estr = F.estrelas.map(([c, r]) => ({ x: c * T + 4, y: r * T + 4, pego: false }));
     for (let i = 0; i < F.chao.length - 1; i++) {        // arco de estrelas sobre cada buraco
       const a = F.chao[i][1] + 1, b = F.chao[i + 1][0] - 1, n2 = b - a + 3;
@@ -267,7 +334,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
         estr.push({ x: (a - 1 + q) * T + 4, y: row * T + 4, pego: false });
       }
     }
-    itens = []; bumps = {}; pops = []; ps = [];
+    itens = []; balas = []; bumps = {}; pops = []; ps = [];
   }
   function novoMundo(n) { construir(n); ponto = { x: 2 * T, y: 7 * T }; achouCheck = false; renascer(); cam = 0; }
 
@@ -331,9 +398,19 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     }
   }
 
-  /* ---------- Transformação ---------- */
+  /* ---------- Transformação e dano ---------- */
   function crescer() { tam(true); p.y -= 16; p.x -= 3; transf = 50; ganha(50); tom(523, .1); tom(659, .1, 'square', .06, .1); tom(784, .1, 'square', .06, .2); tom(1046, .25, 'square', .06, .3); }
   function encolher() { tam(false); p.y += 16; p.x += 3; transf = 30; inv = 2000; p.vy = -6; tom(500, .4, 'sawtooth', .08, 0, 120); }
+
+  /* Devolve true se o robô foi atingido. O Super Robô só encolhe; o pequeno perde uma vida. */
+  function dano(x0) {
+    if (modo !== 'jogo' || inv > 0) return false;
+    if (p.big) { encolher(); p.vx = p.x < x0 ? -5 : 5; return true; }
+    vidas--; inv = 2000; p.vy = -9; p.vx = p.x < x0 ? -5 : 5;
+    tom(200, .35, 'sawtooth', .09, 0, 60);
+    if (vidas <= 0) terminar(false, 'FIM DE JOGO');
+    return true;
+  }
 
   /* ---------- Robô que joga sozinho na tela de espera ---------- */
   function ia() {
@@ -341,6 +418,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     let pula = sp(dr + 70, pe) || sp(dr + 70, pe - 40);          // parede ou cano à frente
     if (p.noChao && !sp(dr + 6, p.y + p.h + 4)) pula = true;     // buraco: pula na beirada
     if (ini.some(e => !e.morto && e.x > p.x && e.x - dr < 90 && Math.abs((e.y + e.h) - (p.y + p.h)) < 30)) pula = true;
+    if (balas.some(b => b.vx < 0 && b.x > p.x && b.x - dr < 110 && Math.abs(b.y - p.y) < 50)) pula = true;
     if (pula && p.noChao && iaSeg <= 0) iaSeg = 20 + Math.floor(Math.random() * 8);
     ctl = { e: false, d: true, p: iaSeg > 0 }; if (iaSeg > 0) iaSeg--;
   }
@@ -385,23 +463,73 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     for (const e of ini) {                               // inimigos só se mexem quando estão perto da tela
       if (e.morto) { e.morto--; continue; }
       if (Math.abs(e.x - cam) > W + 200) continue;
+      if (e.chute > 0) e.chute--;
       const v = e.vx; moveX(e); if (e.bateu) e.vx = -v;
       e.vy += GRAV; moveY(e, false);
-      if (e.noChao) {
+      if (e.noChao && e.estado !== 2) {
         const ahead = Math.floor((e.x + (e.vx > 0 ? e.w : -1)) / T), rb = Math.floor((e.y + e.h) / T);
         if (!solido(ahead, rb)) e.vx = -e.vx;
       }
       if (e.y > H + 100) { e.morto = 1; e.y = 9999; continue; }
+
+      if (e.tipo === 'casco' && e.estado === 2) {        // casco chutado derruba os outros inimigos
+        for (const o of ini) if (o !== e && !o.morto && bate(e, o)) {
+          o.morto = 30; ganha(20); faisca(o.x + 16, o.y + 10, 8, ['#ff4d6d', '#fff']); tom(200, .1, 'square', .08, 0, 500);
+        }
+      }
       if (!bate(p, e)) continue;
-      if (e.tipo === 'bug' && p.vy > 0 && (p.y + p.h) - e.y < 24) {
+      const pisou = p.vy > 0 && (p.y + p.h) - e.y < 24;
+
+      if (e.tipo === 'virus') { if (dano(e.x)) return; continue; }
+
+      if (e.tipo === 'casco') {
+        if (e.estado === 0) {
+          if (pisou) {                                    // vira casco parado
+            e.estado = 1; e.vx = 0; e.y += 8; e.h = 22; p.vy = cp ? -12 : -8; ganha(20); if (modo === 'jogo') pisados++;
+            tom(250, .14, 'square', .08, 0, 600);
+          } else if (dano(e.x) && (modo !== 'jogo' || transf > 0)) return;
+        } else if (e.estado === 1) {                      // casco parado: o robô chuta
+          e.estado = 2; e.vx = p.x + p.w / 2 < e.x + e.w / 2 ? 7 : -7; e.chute = 15; ganha(10);
+          tom(180, .12, 'square', .08, 0, 500);
+        } else if (pisou) {                               // pisar no casco que corre o para
+          e.estado = 1; e.vx = 0; p.vy = -8; tom(250, .1, 'square', .08, 0, 500);
+        } else if (e.chute <= 0 && dano(e.x) && (modo !== 'jogo' || transf > 0)) return;
+        continue;
+      }
+
+      if (pisou) {                                        // bug comum
         e.morto = 30; p.vy = cp ? -12 : -8; ganha(20); if (modo === 'jogo') pisados++;
         faisca(e.x + 16, e.y + 10, 8, ['#ff4d6d', '#fff']); tom(250, .14, 'square', .08, 0, 600);
-      } else if (modo === 'jogo' && inv <= 0) {
-        if (p.big) { encolher(); p.vx = p.x < e.x ? -5 : 5; return; }
-        vidas--; inv = 2000; p.vy = -9; p.vx = p.x < e.x ? -5 : 5;
-        tom(200, .35, 'sawtooth', .09, 0, 60);
-        if (vidas <= 0) { terminar(false, 'FIM DE JOGO'); return; }
+      } else if (dano(e.x) && (modo !== 'jogo' || transf > 0)) return;
+    }
+
+    for (const c of canhoes) {                           // canhões atiram quando o robô está por perto
+      if (Math.abs(c.x - (cam + W / 2)) > W / 2 + 60) continue;
+      if (--c.t > 0) continue;
+      const dx = (p.x + p.w / 2) - (c.x + T / 2);
+      if (Math.abs(dx) < 100) { c.t = 30; continue; }
+      const d = dx < 0 ? -1 : 1;
+      balas.push({ x: d < 0 ? c.x - 30 : c.x + T, y: c.y + 8, w: 30, h: 24, vx: d * 3.2 });
+      faisca(d < 0 ? c.x : c.x + T, c.y + 20, 6, ['#ffd23f', '#ff9a3d', '#fff']);
+      tom(120, .2, 'sawtooth', .07, 0, 50); c.t = 150 + Math.floor(Math.random() * 60);
+    }
+    for (const b of balas) {                             // balas de canhão
+      b.x += b.vx;
+      if (Math.abs(b.x - cam) > W + 300) b.morta = true;
+      if (!b.morta && bate(p, b)) {
+        if (p.vy > 0 && (p.y + p.h) - b.y < 20) {         // dá para pisar na bala
+          b.morta = true; p.vy = cp ? -12 : -8; ganha(20); faisca(b.x + 15, b.y + 12, 8, ['#8e93b8', '#fff']); tom(250, .14, 'square', .08, 0, 600);
+        } else if (dano(b.x) && (modo !== 'jogo' || transf > 0)) return;
       }
+    }
+    balas = balas.filter(b => !b.morta);
+
+    for (const pl of plantas) {                          // flores-chip: sobem e descem dos canos
+      const perto = Math.abs((p.x + p.w / 2) - (pl.x + 14)) < 70;
+      if (!(pl.t % 270 >= 150 && perto)) pl.t++;          // não sobe com o robô em cima do cano
+      const c = pl.t % 270;
+      pl.alt = c < 40 ? c / 40 * 42 : c < 110 ? 42 : c < 150 ? (150 - c) / 40 * 42 : 0;
+      if (pl.alt > 8 && bate(p, { x: pl.x, y: pl.topo - pl.alt, w: 28, h: pl.alt })) { if (dano(pl.x) && (modo !== 'jogo' || transf > 0)) return; }
     }
 
     for (const s of estr) {
@@ -466,7 +594,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
         cx.beginPath(); cx.moveTo(x, y - 14); cx.lineTo(x + 9, y); cx.lineTo(x, y + 14); cx.lineTo(x - 9, y); cx.fill();
       }
       cx.globalAlpha = 1;
-    } else {
+    } else if (tema === 2) {
       cx.fillStyle = gNoite; cx.fillRect(0, 0, W, H);
       cx.fillStyle = '#fff';
       for (let i = 0; i < 40; i++) if ((i + Math.floor(anima / 30)) % 7) cx.fillRect(mod(i * 97 - camx * .05, W), (i * 53) % 220, 2, 2);
@@ -480,6 +608,30 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
           for (let yy = 320 - b.h + 14; yy < 300; yy += 28) for (let xx = bx + 10; xx < bx + b.w - 14; xx += 22) if ((xx + yy + bi) % 3) cx.fillRect(xx, yy, 8, 8);
         }
       });
+    } else if (tema === 3) {                              // fábrica: engrenagens girando ao fundo
+      cx.fillStyle = '#3a3f4e'; cx.fillRect(0, 0, W, H);
+      cx.strokeStyle = '#4d5366'; cx.lineWidth = 14;
+      for (let i = 0; i < 5; i++) {
+        const x = mod(i * 220 - camx * .3, W + 220) - 110, y = 90 + (i % 2) * 120, r = 50 + (i % 3) * 14;
+        cx.setLineDash([12, 10]); cx.lineDashOffset = (i % 2 ? 1 : -1) * anima * .4;
+        cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.stroke();
+        cx.setLineDash([]); cx.lineWidth = 6; cx.beginPath(); cx.arc(x, y, r - 22, 0, 7); cx.stroke(); cx.lineWidth = 14;
+      }
+      cx.setLineDash([]);
+    } else {                                              // castelo: parede de tijolos, tochas e lava
+      cx.fillStyle = '#1a0f1f'; cx.fillRect(0, 0, W, H);
+      cx.fillStyle = '#2a1830';
+      for (let r = 0; r < 9; r++) for (let c = -1; c < 12; c++) {
+        const x = mod(c * 80 + (r % 2) * 40 - camx * .4, W + 160) - 80;
+        cx.fillRect(x, r * 40 + 2, 76, 36);
+      }
+      for (let i = 0; i < 4; i++) {
+        const x = mod(i * 260 - camx * .4, W + 260) - 130 + 40;
+        cx.fillStyle = '#5a3a2a'; cx.fillRect(x - 3, 150, 6, 22);
+        cx.fillStyle = Math.floor(anima / 6 + i) % 2 ? '#ffd23f' : '#ff9a3d'; cx.fillRect(x - 6, 130, 12, 20);
+        cx.fillStyle = '#fff3a0'; cx.fillRect(x - 2, 138, 4, 8);
+      }
+      cx.fillStyle = Math.floor(anima / 10) % 2 ? '#ff6a2a' : '#ff8f3a'; cx.fillRect(0, 372, W, 28);   // lava nos buracos
     }
   }
 
@@ -487,7 +639,8 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     const camx = Math.round(cam), ts = TS[tema];
     fundo(camx);
 
-    itens.forEach(it => cx.drawImage(BAT, it.x - 1 - camx, it.y - 6, 32, 36));   // desenhadas antes dos blocos: saem de dentro deles
+    itens.forEach(it => cx.drawImage(BAT, it.x - 1 - camx, it.y - 6, 32, 36));   // antes dos blocos e canos: saem de dentro deles
+    plantas.forEach(pl => cx.drawImage(FLOR, pl.x - 4 - camx, pl.topo - pl.alt, 36, 42));
 
     const c0 = Math.floor(camx / T);
     for (let r = 0; r < ROWS; r++) for (let c = c0; c <= c0 + 21; c++) {
@@ -509,15 +662,30 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
     estr.forEach(s => { if (!s.pego && s.x - camx > -40 && s.x - camx < W) cx.drawImage(ESTR, s.x - camx, s.y + bob, 32, 32); });
     ini.forEach(e => {
       if (e.y > H || e.x - camx < -60 || e.x - camx > W) return;
-      if (e.tipo === 'virus') cx.drawImage(VIRUS, e.x - 4 - camx, e.y - 8, 40, 40);
-      else cx.drawImage(e.morto ? BUGP : BUG, e.x - 4 - camx, e.y - 2, 40, 28);
+      if (e.tipo === 'virus') { cx.drawImage(VIRUS, e.x - 4 - camx, e.y - 8, 40, 40); return; }
+      if (e.tipo === 'casco') {
+        if (e.estado === 0) {                              // caracol: espelhado quando anda para a direita
+          const dx = Math.round(e.x - 2 - camx);
+          cx.save();
+          if (e.vx > 0) { cx.translate(dx + 36, e.y); cx.scale(-1, 1); cx.drawImage(CASCO, 0, 0, 36, 30); } else cx.drawImage(CASCO, dx, e.y, 36, 30);
+          cx.restore();
+        } else cx.drawImage(CASCOP, e.x - 2 - camx, e.y, 36, 24);
+        return;
+      }
+      cx.drawImage(e.morto ? BUGP : BUG, e.x - 4 - camx, e.y - 2, 40, 28);
+    });
+    balas.forEach(b => {
+      const dx = Math.round(b.x - 3 - camx);
+      cx.save();
+      if (b.vx < 0) { cx.translate(dx + 36, b.y - 3); cx.scale(-1, 1); cx.drawImage(BALA, 0, 0, 36, 30); } else cx.drawImage(BALA, dx, b.y - 3, 36, 30);
+      cx.restore();
     });
 
     if (!(inv > 0 && Math.floor(inv / 100) % 2)) {
       let grande = p.big;
       if (transf > 0) grande = Math.floor(transf / 4) % 2 === 0 ? p.big : !p.big;   // pisca entre pequeno e grande
-      const nome2 = !p.noChao ? 'j' : Math.abs(p.vx) > .5 ? (Math.floor(anima / 6) % 2 ? 'a' : 'b') : 'b';
-      const f = (grande ? ROBOG : ROBO)[nome2];
+      const q = !p.noChao ? 'j' : Math.abs(p.vx) > .5 ? (Math.floor(anima / 6) % 2 ? 'a' : 'b') : 'b';
+      const f = (grande ? ROBOG : ROBO)[q];
       const dw = grande ? 48 : 36, dh = grande ? 56 : 42;
       const dx = Math.round(p.x + p.w / 2 - dw / 2 - camx), dy = Math.round(p.y + p.h - dh + (grande ? 0 : 4));
       cx.save();
@@ -580,6 +748,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
   }
 
   function terminar(venceu, titulo) {
+    if (modo === 'fim') return;
     if (!venceu) [392, 330, 262].forEach((f, i) => tom(f, .25, 'square', .06, i * .18));
     modo = 'fim';
     const pos = salvar(nome, pontos);
